@@ -30,18 +30,21 @@ if [ ! -f "$RC_LOCAL" ]; then
     chmod +x "$RC_LOCAL"
 fi
 
-# Add the script to rc.local for boot persistence if not already added
+# Add a one-time execution command for the script in rc.local
+ONE_TIME_CHECK="/var/run/xray_installed"
+
 if ! grep -q "$LOCAL_SCRIPT_PATH" "$RC_LOCAL"; then
-    echo "Adding $LOCAL_SCRIPT_PATH to $RC_LOCAL..."
-    sed -i "/exit 0/i $LOCAL_SCRIPT_PATH &" "$RC_LOCAL"
+    echo "Adding one-time execution logic for $LOCAL_SCRIPT_PATH to $RC_LOCAL..."
+    sed -i "/exit 0/i if [ ! -f \"$ONE_TIME_CHECK\" ]; then\n  $LOCAL_SCRIPT_PATH\n  touch \"$ONE_TIME_CHECK\"\nfi\n" "$RC_LOCAL"
 else
-    echo "$LOCAL_SCRIPT_PATH is already in $RC_LOCAL."
+    echo "One-time execution logic is already in $RC_LOCAL."
 fi
 
 # Run the install_xray.sh script immediately
 if [ -x "$LOCAL_SCRIPT_PATH" ]; then
     echo "Running $LOCAL_SCRIPT_PATH..."
     "$LOCAL_SCRIPT_PATH"
+    touch "$ONE_TIME_CHECK"
 else
     echo "Failed to find or execute $LOCAL_SCRIPT_PATH."
     exit 1
