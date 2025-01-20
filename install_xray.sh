@@ -23,7 +23,7 @@ fi
 
 
 
-cp /tmp/install_xray.sh /etc/init.d/install_xray
+cp /install_xray.sh /etc/init.d/install_xray
 chmod +x /etc/init.d/install_xray
 
 /etc/init.d/install_xray enable
