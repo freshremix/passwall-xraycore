@@ -1,4 +1,6 @@
 opkg update
+opkg install mwan3
+opkh install luci-app-mwan3
 wget -O passwall.pub https://master.dl.sourceforge.net/project/openwrt-passwall-build/passwall.pub
 opkg-key add passwall.pub
 opkg remove dnsmasq
