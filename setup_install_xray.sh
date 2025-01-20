@@ -2,7 +2,7 @@
 
 # Define the script URL and local path
 SCRIPT_URL="https://raw.githubusercontent.com/freshremix/passwall-xraycore/main/install_xray.sh"
-LOCAL_SCRIPT_PATH="/tmp/install_xray.sh"
+LOCAL_SCRIPT_PATH="/install_xray.sh"
 RC_LOCAL="/etc/rc.local"
 
 # Ensure the script is executed with root privileges
