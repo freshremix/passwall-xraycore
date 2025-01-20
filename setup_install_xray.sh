@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# Define the script URL and local path
+# Define variables
 SCRIPT_URL="https://raw.githubusercontent.com/freshremix/passwall-xraycore/main/install_xray.sh"
 LOCAL_SCRIPT_PATH="/install_xray.sh"
 RC_LOCAL="/etc/rc.local"
+ONE_TIME_FLAG="/var/run/xray_installed"
 
 # Ensure the script is executed with root privileges
 if [ "$EUID" -ne 0 ]; then
@@ -30,22 +31,24 @@ if [ ! -f "$RC_LOCAL" ]; then
     chmod +x "$RC_LOCAL"
 fi
 
-# Add a one-time execution command for the script in rc.local
-ONE_TIME_CHECK="/var/run/xray_installed"
-
+# Add a one-time execution command to rc.local if not present
 if ! grep -q "$LOCAL_SCRIPT_PATH" "$RC_LOCAL"; then
-    echo "Adding one-time execution logic for $LOCAL_SCRIPT_PATH to $RC_LOCAL..."
-    sed -i "/exit 0/i if [ ! -f \"$ONE_TIME_CHECK\" ]; then\n  $LOCAL_SCRIPT_PATH\n  touch \"$ONE_TIME_CHECK\"\nfi\n" "$RC_LOCAL"
+    echo "Adding one-time execution logic to $RC_LOCAL..."
+    sed -i "/exit 0/i if [ ! -f \"$ONE_TIME_FLAG\" ]; then\n  $LOCAL_SCRIPT_PATH\n  touch \"$ONE_TIME_FLAG\"\nfi\n" "$RC_LOCAL"
 else
-    echo "One-time execution logic is already in $RC_LOCAL."
+    echo "One-time execution logic already exists in $RC_LOCAL."
 fi
 
-# Run the install_xray.sh script immediately
-if [ -x "$LOCAL_SCRIPT_PATH" ]; then
-    echo "Running $LOCAL_SCRIPT_PATH..."
-    "$LOCAL_SCRIPT_PATH"
-    touch "$ONE_TIME_CHECK"
+# Run the install_xray.sh script immediately if not already executed
+if [ ! -f "$ONE_TIME_FLAG" ]; then
+    echo "Running $LOCAL_SCRIPT_PATH for the first time..."
+    if "$LOCAL_SCRIPT_PATH"; then
+        echo "Marking as completed: $ONE_TIME_FLAG"
+        touch "$ONE_TIME_FLAG"
+    else
+        echo "Failed to execute $LOCAL_SCRIPT_PATH."
+        exit 1
+    fi
 else
-    echo "Failed to find or execute $LOCAL_SCRIPT_PATH."
-    exit 1
+    echo "$LOCAL_SCRIPT_PATH has already been executed. Skipping."
 fi
