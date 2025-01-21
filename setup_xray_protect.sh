@@ -1,5 +1,4 @@
 #!/bin/sh
-vi /setup_xray_protect.sh
 cat <<EOF > /etc/init.d/xray_protect
 #!/bin/sh /etc/rc.common
 START=99
