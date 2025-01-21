@@ -24,3 +24,4 @@ wget -O direct_ip https://raw.githubusercontent.com/amirhosseinchoghaei/iran-ipl
 rm -f direct_host
 wget -O direct_host https://raw.githubusercontent.com/amirhosseinchoghaei/iran-iplist/main/direct_host || exit 1
 /etc/init.d/passwall restart || exit 1
+rm -f /tmp/xray-core.ipk
