@@ -1,47 +1,26 @@
 #!/bin/sh
-# Check if the script has already run
-if [ -f /etc/installed_xray ]; then
-    echo "Xray installation already completed."
-    exit 0
-fi
-
-# Download the xray-core package
-wget -O /tmp/xray-core.ipk "https://kumisystems.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-21.02/mipsel_24kc/passwall_packages/xray-core_25.1.1-1_mipsel_24kc.ipk?viasf=1"
-
-# Update opkg and install the package
+sleep 15
+wget -O /tmp/xray-core.ipk "https://kumisystems.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-21.02/mipsel_24kc/passwall_packages/xray-core_25.1.1-1_mipsel_24kc.ipk?viasf=1" || exit 1
+sleep 5
 opkg update
-opkg --dest ram install /tmp/xray-core.ipk
-
-# Find the xray binary and move it to the desired location
+sleep 10
+opkg --dest ram install /tmp/xray-core.ipk || exit 1
 XRAY_PATH=$(find / -name "xray" 2>/dev/null | head -n 1)
-if [ -n "$XRAY_PATH" ]; then
-    mkdir -p /tmp/usr/bin
-    mv "$XRAY_PATH" /tmp/usr/bin/xray
-    chmod +x /tmp/usr/bin/xray
-    echo "Xray binary moved to /tmp/usr/bin/xray."
-else
-    echo "Xray binary not found."
-    exit 1
-fi
-
-# Verify the xray installation
-/tmp/usr/bin/xray version
-
-# Mark the script as run
-touch /etc/installed_xray
-
-# Copy and enable the init script
-cp /install_xray.sh /etc/init.d/install_xray
+[ -n "$XRAY_PATH" ] && mkdir -p /tmp/usr/bin && mv "$XRAY_PATH" /tmp/usr/bin/xray && chmod +x /tmp/usr/bin/xray || exit 1
+/tmp/usr/bin/xray version || exit 1
+cat <<EOF > /etc/init.d/install_xray
+#!/bin/sh /etc/rc.common
+START=99
+start() {
+    sh /etc/install_xray.sh
+}
+EOF
 chmod +x /etc/init.d/install_xray
 /etc/init.d/install_xray enable
-
-# Update passwall rules
-cd /usr/share/passwall/rules/
-rm -r direct_ip
-wget https://raw.githubusercontent.com/amirhosseinchoghaei/iran-iplist/main/direct_ip
-
-rm -r direct_host
-wget https://raw.githubusercontent.com/amirhosseinchoghaei/iran-iplist/main/direct_host
-
-# Restart passwall service
-/etc/init.d/passwall restart
+cp $0 /etc/install_xray.sh
+cd /usr/share/passwall/rules/ || exit 1
+rm -f direct_ip
+wget -O direct_ip https://raw.githubusercontent.com/amirhosseinchoghaei/iran-iplist/main/direct_ip || exit 1
+rm -f direct_host
+wget -O direct_host https://raw.githubusercontent.com/amirhosseinchoghaei/iran-iplist/main/direct_host || exit 1
+/etc/init.d/passwall restart || exit 1
