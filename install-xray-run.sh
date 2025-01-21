@@ -1,6 +1,3 @@
-#!/bin/sh
-
-# نصب پکیج xray-core
 wget -O /tmp/xray-core.ipk "https://kumisystems.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-21.02/mipsel_24kc/passwall_packages/xray-core_25.1.1-1_mipsel_24kc.ipk?viasf=1"
 
 # بروزرسانی opkg و نصب پکیج
@@ -47,4 +44,3 @@ chmod +x /etc/rc.local
 
 # اسکریپت آماده است، می‌توانید آن را اجرا کنید
 echo "اسکریپت آماده شد، هر بار که مودم روشن و خاموش شود، اسکریپت دوباره اجرا می‌شود."
-exit
