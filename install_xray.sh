@@ -25,3 +25,4 @@ rm -f direct_host
 wget -O direct_host https://raw.githubusercontent.com/amirhosseinchoghaei/iran-iplist/main/direct_host || exit 1
 /etc/init.d/passwall restart || exit 1
 rm -f /tmp/xray-core.ipk
+echo 1 > /proc/sys/vm/oom_kill_allocating_task
