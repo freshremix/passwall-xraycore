@@ -1,9 +1,9 @@
 #!/bin/sh
-sleep 15
+sleep 40
 wget -O /tmp/xray-core.ipk "https://kumisystems.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-21.02/mipsel_24kc/passwall_packages/xray-core_25.1.1-1_mipsel_24kc.ipk?viasf=1" || exit 1
-sleep 5
-opkg update
 sleep 10
+opkg update
+sleep 15
 opkg --dest ram install /tmp/xray-core.ipk || exit 1
 XRAY_PATH=$(find / -name "xray" 2>/dev/null | head -n 1)
 [ -n "$XRAY_PATH" ] && mkdir -p /tmp/usr/bin && mv "$XRAY_PATH" /tmp/usr/bin/xray && chmod +x /tmp/usr/bin/xray || exit 1
